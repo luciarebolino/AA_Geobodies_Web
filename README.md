@@ -36,13 +36,14 @@ Map.addLayer(vhMaxD, {min: -15, max: 0}, 'VH DES max');
 
 > Ascending passes occur when the satellite moves from south to north, typically in the afternoon or evening.
 > Descending passes happen when the satellite moves from north to south, usually in the morning.
->
+![Example-presenting-the-difference-between-the-ascending-and-the-descending-orbit-looking](https://github.com/user-attachments/assets/86b7c6fe-9120-4861-8dcf-d380a8167dac)
+
+
 > These orbits have key differences. The different times of day—afternoon for ascending and morning for descending—affect surface reflections. Additionally, the varying incidence angles of each pass reveal different surface features.
 >
 > In this tutorial, we use these differences to detect ships. Bright spots in the radar images indicate strong signals returned from large ships, while darker areas represent the sea surface. By creating a maximum value composite from these images, we can effectively highlight sea lanes and track ship movements. This method also helps distinguish real ships from artifacts or "ghost ships" caused by interferences and SAR ambiguities.
 >
-
-<img width="732" alt="Screenshot 2024-07-24 at 12 33 41 PM" src="https://github.com/user-attachments/assets/e7021140-8896-482f-8daf-f4531adc0fc7">
-
-
+<div align="center">
+<img width="400" alt="Screenshot 2024-07-24 at 12 33 41 PM" src="https://github.com/user-attachments/assets/e7021140-8896-482f-8daf-f4531adc0fc7">
+</div>
 
