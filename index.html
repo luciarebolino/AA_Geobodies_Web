@@ -21,7 +21,7 @@
     // Set your Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1IjoibHVjaWFyZWJvbGlubyIsImEiOiJja2h5czJyd3UwOGV4MnVtdDdqOWxoMGUwIn0.hQ-Np9Ct0IhcCoQ-cBXfCQ';
 
-    // Initialize the map with an empty style
+    // Initialize the map
     var map = new mapboxgl.Map({
         container: 'map',
         style: {
@@ -32,12 +32,12 @@
         center: [12.292051, 45.372576], // Venice Lagoon coordinates
         zoom: 11,
         pitch: 45, // Tilt the map for 3D effect
-        bearing: -54.6, // Rotate the map for 3D effect
         attributionControl: false // Disable default attribution control
     });
 
     // Enable 3D terrain and add layers
     map.on('load', function () {
+        // Add DEM source and terrain
         map.addSource('mapbox-dem', {
             'type': 'raster-dem',
             'url': 'mapbox://mapbox.terrain-rgb'
@@ -45,6 +45,7 @@
 
         map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
 
+        // Add sky layer
         map.addLayer({
             'id': 'sky',
             'type': 'sky',
@@ -55,7 +56,7 @@
             }
         });
 
-        // Add the countries outline layer
+        // Add countries outline layer
         map.addSource('countries', {
             'type': 'vector',
             'url': 'mapbox://mapbox.country-boundaries-v1'
@@ -72,13 +73,12 @@
             }
         });
 
-        // Add the custom tileset layer for bathymetry
+        // Add custom tileset layer for bathymetry
         map.addSource('bathymetry', {
             'type': 'vector',
             'url': 'mapbox://luciarebolino.9iqwq3fv' // Replace with your actual tileset ID
         });
 
-        // Use the correct source layer name
         map.addLayer({
             'id': 'bathymetry-outline',
             'type': 'line',
@@ -89,6 +89,31 @@
                 'line-width': 0.1
             }
         });
+
+        // Add the video source and layer
+        map.addSource('video', {
+            type: 'video',
+            urls: [
+                'https://attachments.are.na/29588406/cbb9ed63dd4eeba8c0a667beca67c254.mp4?1721822528' // Path to your video file
+            ],
+            coordinates: [
+            // Corrected bounding box coordinates
+            [12.073989772214944, 45.60774777837705],  // New Northeast corner (original Northwest corner)
+[12.687850856199319, 45.60774777837705],  // New Northwest corner (original Northeast corner)
+[12.687850856199319, 45.16311249146351],  // New Southwest corner (original Southeast corner)
+[12.073989772214944, 45.16311249146351]  
+            ]
+        });
+
+        map.addLayer({
+            id: 'video-layer',
+            type: 'raster',
+            source: 'video',
+            paint: {}
+        });
+
+        // Rotate the map to the desired bearing
+        map.setBearing(-54.6);
     });
 
     // Add a layer switch control
@@ -132,7 +157,7 @@
                     "source-layer": "batimetria-dufemr", // Correct source layer name
                     "paint": {
                         "line-color": "#000000",
-                        "line-width": 0.
+                        "line-width": 0.1
                     }
                 },
                 {
