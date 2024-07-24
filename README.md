@@ -36,8 +36,11 @@ Map.addLayer(vhMaxD, {min: -15, max: 0}, 'VH DES max');
 
 > Ascending passes occur when the satellite moves from south to north, typically in the afternoon or evening.
 > Descending passes happen when the satellite moves from north to south, usually in the morning.
-![Example-presenting-the-difference-between-the-ascending-and-the-descending-orbit-looking](https://github.com/user-attachments/assets/86b7c6fe-9120-4861-8dcf-d380a8167dac)
+>
 
+<div align="center">
+<img width="400" alt="Example-presenting-the-difference-between-the-ascending-and-the-descending-orbit-looking" src="https://github.com/user-attachments/assets/86b7c6fe-9120-4861-8dcf-d380a8167dac">
+</div>
 
 > These orbits have key differences. The different times of day—afternoon for ascending and morning for descending—affect surface reflections. Additionally, the varying incidence angles of each pass reveal different surface features.
 >
