@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Mapbox 3D Webmap with Custom Tileset</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .mapboxgl-ctrl-bottom-left { display: flex; flex-direction: column; }
+        .mapboxgl-ctrl-group { margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+    // Set your Mapbox access token
+    mapboxgl.accessToken = 'pk.eyJ1IjoibHVjaWFyZWJvbGlubyIsImEiOiJja2h5czJyd3UwOGV4MnVtdDdqOWxoMGUwIn0.hQ-Np9Ct0IhcCoQ-cBXfCQ';
+
+    // Initialize the map with an empty style
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: {
+            "version": 8,
+            "sources": {},
+            "layers": []
+        },
+        center: [12.292051, 45.372576], // Venice Lagoon coordinates
+        zoom: 11,
+        pitch: 45, // Tilt the map for 3D effect
+        bearing: -54.6, // Rotate the map for 3D effect
+        attributionControl: false // Disable default attribution control
+    });
+
+    // Enable 3D terrain and add layers
+    map.on('load', function () {
+        map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.terrain-rgb'
+        });
+
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+
+        map.addLayer({
+            'id': 'sky',
+            'type': 'sky',
+            'paint': {
+                'sky-type': 'atmosphere',
+                'sky-atmosphere-sun': [0.0, 0.0],
+                'sky-atmosphere-sun-intensity': 15
+            }
+        });
+
+        // Add the countries outline layer
+        map.addSource('countries', {
+            'type': 'vector',
+            'url': 'mapbox://mapbox.country-boundaries-v1'
+        });
+
+        map.addLayer({
+            'id': 'countries-outline',
+            'type': 'line',
+            'source': 'countries',
+            'source-layer': 'country_boundaries',
+            'paint': {
+                'line-color': '#000000',
+                'line-width': 0.5
+            }
+        });
+
+        // Add the custom tileset layer for bathymetry
+        map.addSource('bathymetry', {
+            'type': 'vector',
+            'url': 'mapbox://luciarebolino.9iqwq3fv' // Replace with your actual tileset ID
+        });
+
+        // Use the correct source layer name
+        map.addLayer({
+            'id': 'bathymetry-outline',
+            'type': 'line',
+            'source': 'bathymetry',
+            'source-layer': 'batimetria-dufemr', // This should be the name of the source layer in your tileset
+            'paint': {
+                'line-color': '#000000',
+                'line-width': 0.1
+            }
+        });
+    });
+
+    // Add a layer switch control
+    var layerList = document.createElement('div');
+    layerList.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+
+    var countryButton = document.createElement('button');
+    countryButton.textContent = 'Countries Outline';
+    countryButton.onclick = function() {
+        map.setStyle({
+            "version": 8,
+            "sources": {
+                "mapbox-dem": {
+                    "type": "raster-dem",
+                    "url": "mapbox://mapbox.terrain-rgb"
+                },
+                "countries": {
+                    "type": "vector",
+                    "url": "mapbox://mapbox.country-boundaries-v1"
+                },
+                "bathymetry": {
+                    "type": "vector",
+                    "url": 'mapbox://luciarebolino.9iqwq3fv' // Replace with your actual tileset ID
+                }
+            },
+            "layers": [
+                {
+                    "id": "countries-outline",
+                    "type": "line",
+                    "source": "countries",
+                    "source-layer": "country_boundaries",
+                    "paint": {
+                        "line-color": "#000000",
+                        "line-width": 0.5
+                    }
+                },
+                {
+                    "id": "bathymetry-outline",
+                    "type": "line",
+                    "source": "bathymetry",
+                    "source-layer": "batimetria-dufemr", // Correct source layer name
+                    "paint": {
+                        "line-color": "#000000",
+                        "line-width": 0.
+                    }
+                },
+                {
+                    "id": "sky",
+                    "type": "sky",
+                    "paint": {
+                        "sky-type": "atmosphere",
+                        "sky-atmosphere-sun": [0.0, 0.0],
+                        "sky-atmosphere-sun-intensity": 15
+                    }
+                }
+            ]
+        });
+
+        map.on('style.load', function() {
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+        });
+    };
+    layerList.appendChild(countryButton);
+
+    var satelliteButton = document.createElement('button');
+    satelliteButton.textContent = 'Satellite View';
+    satelliteButton.onclick = function() {
+        map.setStyle('mapbox://styles/mapbox/satellite-v9');
+        map.on('style.load', function() {
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+
+            map.addLayer({
+                'id': 'sky',
+                'type': 'sky',
+                'paint': {
+                    'sky-type': 'atmosphere',
+                    'sky-atmosphere-sun': [0.0, 0.0],
+                    'sky-atmosphere-sun-intensity': 15
+                }
+            });
+        });
+    };
+    layerList.appendChild(satelliteButton);
+
+    var ctrlBottomLeft = document.querySelector('.mapboxgl-ctrl-bottom-left');
+    ctrlBottomLeft.appendChild(layerList);
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+</script>
+
+</body>
+</html>
