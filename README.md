@@ -196,8 +196,14 @@ Note the tileset ID provided after the upload is complete.
     });
 </script>
 ```
+- Step 9: Make the Tileset Public - (!!! very important so these layers will be added to the main Web Map)
+1. In Mapbox Studio, go to your tilesets.
+1. Find the tileset you just uploaded and click on it.
+1. Click on "Share" or "Share & use".
+1. Toggle the switch to make the tileset public.
+1. Note the tileset ID provided after the upload is complete.
 
-# 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
+## 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
 
 The Normalized Difference Vegetation Index (NDVI) is a numerical indicator that uses the visible and near-infrared bands of the electromagnetic spectrum to analyze vegetation health. The NDVI is calculated using the following formula:
 
@@ -459,3 +465,15 @@ Map.addLayer(vhMaxD, {min: -15, max: 0}, 'VH DES max');
 > In this tutorial, we use these differences to detect ships. Bright spots in the radar images indicate strong signals returned from large ships, while darker areas represent the sea surface. By creating a maximum value composite from these images, we can effectively highlight sea lanes and track ship movements. This method also helps distinguish real ships from artifacts or "ghost ships" caused by interferences and SAR ambiguities.
 >
 
+
+
+## Are.na 
+### Archiving and sharing videos to be hosted on the main Map
+
+<img width="1529" alt="Screenshot 2024-07-26 at 12 25 36 AM" src="https://github.com/user-attachments/assets/9c913fcb-d569-466b-a2c8-41427aa0b871">
+
+Every video or timelapse exported from Google Earth Engine (GEE) will be saved as a Block, with the coordinates previously printed in the console added as comments. This will enable geolocation on the map.
+
+Feel free to test different areas—smaller or larger, with multiple palettes and varying time frames. The idea is to populate the lagoon and the area surrounding Venice with as many video indexes as possible.
+
+Regarding the GeoJSON, it is important that all the tilesets uploaded to Mapbox are shared as public so that they can be included on the main map. Please copy and paste the line of code as an example with all the layers you want to add and be visible on the platform. Experiment with shapes and colors, and add your group number (e.g., G2) to the title. In the description, write two or more lines describing your layer. These descriptions will be visible to users toggling your layer on the map in the future.
