@@ -165,6 +165,20 @@ Export.image.toDrive({
 }); // Export the NDVI mosaic to Google Drive
 
 ```
+
+
+
+# 1. NDWI (Normalized Difference Water Index) - Sentinel-2 
+
+>The Normalized Difference Water Index (NDWI) is a numerical indicator that uses the green and near-infrared (NIR) bands of the electromagnetic spectrum to delineate open water features and enhance the presence of water bodies in remotely sensed digital imagery. It is particularly useful for identifying water bodies and monitoring changes in water content in vegetation and soil. The NDWI is calculated using the following formula:
+
+$$
+\text{NDWI} = \frac{\text{Green} - \text{NIR}}{\text{Green} + \text{NIR}}
+$$
+
+<img width="1529" alt="Screenshot 2024-07-25 at 9 41 19 PM" src="https://github.com/user-attachments/assets/e7b63b69-a6d2-4cda-8072-f0c4bbe8a6b5">
+
+
 # 4. SHIPPING LANES - Sentinel-1 - SAR
 
 ### Step 1: Sentinel-1 VH Polarization Analysis
