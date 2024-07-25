@@ -8,14 +8,69 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css" rel="stylesheet" />
     <style>
         body { margin: 0; padding: 0; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="blue"/></svg>') 10 10, auto; }
         .mapboxgl-ctrl-bottom-left { display: flex; flex-direction: column; }
-        .mapboxgl-ctrl-group { margin-top: 10px; }
+        .circle-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #000; /* Black background */
+            border: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            font-size: 14px; /* Adjusted font size */
+            color: #fff; /* White text */
+            cursor: pointer;
+            margin: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib {
+            display: none !important;
+        }
+        .mapboxgl-ctrl-group > button {
+            background: none;
+            box-shadow: none;
+        }
+        .logo {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px; /* Adjust the width as needed */
+            height: auto;
+        }
+        #coordinates-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .rectangular-box {
+            padding: 5px 10px;
+            background-color: #000; /* Black background */
+            border: 1px solid #000;
+            border-radius: 5px; /* Rounded corners */
+            font-family: Arial, sans-serif;
+            font-size: 14px; /* Adjusted font size */
+            color: #fff; /* White text */
+            margin: 4px 0; /* Space between boxes */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
 <div id="map"></div>
+<img src="logo.png" alt="GEOBODIES - AAVS TerrainLab" class="logo">
+<div id="coordinates-container">
+    <div id="longitude" class="rectangular-box">Lon: 0.0000</div>
+    <div id="latitude" class="rectangular-box">Lat: 0.0000</div>
+</div>
 
 <script>
     // Set your Mapbox access token
@@ -44,17 +99,6 @@
         });
 
         map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
-
-        // Add sky layer
-        map.addLayer({
-            'id': 'sky',
-            'type': 'sky',
-            'paint': {
-                'sky-type': 'atmosphere',
-                'sky-atmosphere-sun': [0.0, 0.0],
-                'sky-atmosphere-sun-intensity': 15
-            }
-        });
 
         // Add countries outline layer
         map.addSource('countries', {
@@ -90,28 +134,6 @@
             }
         });
 
-        // Add the video source and layer
-        map.addSource('video', {
-            type: 'video',
-            urls: [
-                'https://attachments.are.na/29588406/cbb9ed63dd4eeba8c0a667beca67c254.mp4?1721822528' // Path to your video file
-            ],
-            coordinates: [
-            // Corrected bounding box coordinates
-            [12.073989772214944, 45.60774777837705],  // New Northeast corner (original Northwest corner)
-[12.687850856199319, 45.60774777837705],  // New Northwest corner (original Northeast corner)
-[12.687850856199319, 45.16311249146351],  // New Southwest corner (original Southeast corner)
-[12.073989772214944, 45.16311249146351]  
-            ]
-        });
-
-        map.addLayer({
-            id: 'video-layer',
-            type: 'raster',
-            source: 'video',
-            paint: {}
-        });
-
         // Rotate the map to the desired bearing
         map.setBearing(-54.6);
     });
@@ -120,8 +142,9 @@
     var layerList = document.createElement('div');
     layerList.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
 
-    var countryButton = document.createElement('button');
-    countryButton.textContent = 'Countries Outline';
+    var countryButton = document.createElement('div');
+    countryButton.textContent = 'C';
+    countryButton.className = 'circle-button';
     countryButton.onclick = function() {
         map.setStyle({
             "version": 8,
@@ -159,15 +182,6 @@
                         "line-color": "#000000",
                         "line-width": 0.1
                     }
-                },
-                {
-                    "id": "sky",
-                    "type": "sky",
-                    "paint": {
-                        "sky-type": "atmosphere",
-                        "sky-atmosphere-sun": [0.0, 0.0],
-                        "sky-atmosphere-sun-intensity": 15
-                    }
                 }
             ]
         });
@@ -178,22 +192,13 @@
     };
     layerList.appendChild(countryButton);
 
-    var satelliteButton = document.createElement('button');
-    satelliteButton.textContent = 'Satellite View';
+    var satelliteButton = document.createElement('div');
+    satelliteButton.textContent = 'S';
+    satelliteButton.className = 'circle-button';
     satelliteButton.onclick = function() {
         map.setStyle('mapbox://styles/mapbox/satellite-v9');
         map.on('style.load', function() {
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
-
-            map.addLayer({
-                'id': 'sky',
-                'type': 'sky',
-                'paint': {
-                    'sky-type': 'atmosphere',
-                    'sky-atmosphere-sun': [0.0, 0.0],
-                    'sky-atmosphere-sun-intensity': 15
-                }
-            });
         });
     };
     layerList.appendChild(satelliteButton);
@@ -203,6 +208,56 @@
 
     // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl());
+
+    var videoVisible = false;
+
+    // Toggle video on click
+    map.on('click', function() {
+        if (videoVisible) {
+            if (map.getLayer('video-layer')) {
+                map.removeLayer('video-layer');
+            }
+            if (map.getSource('video')) {
+                var video = map.getSource('video').getVideo();
+                video.pause();
+                map.removeSource('video');
+            }
+            videoVisible = false;
+        } else {
+            map.addSource('video', {
+                type: 'video',
+                urls: [
+                    'https://attachments.are.na/29588406/cbb9ed63dd4eeba8c0a667beca67c254.mp4?1721822528' // Path to your video file
+                ],
+                coordinates: [
+                    // Corrected bounding box coordinates
+                    [12.073989772214944, 45.60774777837705],  // New Northeast corner (original Northwest corner)
+                    [12.687850856199319, 45.60774777837705],  // New Northwest corner (original Northeast corner)
+                    [12.687850856199319, 45.16311249146351],  // New Southwest corner (original Southeast corner)
+                    [12.073989772214944, 45.16311249146351]  
+                ]
+            });
+
+            map.addLayer({
+                id: 'video-layer',
+                type: 'raster',
+                source: 'video',
+                paint: {}
+            });
+
+            var video = map.getSource('video').getVideo();
+            video.play();
+            videoVisible = true;
+        }
+    });
+
+    // Display longitude and latitude on mouse move
+    var longitude = document.getElementById('longitude');
+    var latitude = document.getElementById('latitude');
+    map.on('mousemove', function (e) {
+        longitude.textContent = 'Lon: ' + e.lngLat.lng.toFixed(4);
+        latitude.textContent = 'Lat: ' + e.lngLat.lat.toFixed(4);
+    });
 </script>
 
 </body>

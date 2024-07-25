@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Geobodies_WebMap_Test</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<script>
+   
+    // Set your Mapbox access token
+    mapboxgl.accessToken = 'pk.eyJ1IjoibHVjaWFyZWJvbGlubyIsImEiOiJja2h5czJyd3UwOGV4MnVtdDdqOWxoMGUwIn0.hQ-Np9Ct0IhcCoQ-cBXfCQ'; //Your mapbox access token
+
+
+
+     // AAA !! LEAVE THE CODE AS IT IS FROM HERE...
+    // Initialize the map
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: {
+            "version": 8,
+            "sources": {},
+            "layers": []
+        },
+        center: [12.292051, 45.372576], // Venice Lagoon coordinates
+        zoom: 10
+    });
+
+    // Add countries outline layer
+    map.on('load', function () {
+        map.addSource('countries', {
+            'type': 'vector',
+            'url': 'mapbox://mapbox.country-boundaries-v1'
+        });
+
+        map.addLayer({
+            'id': 'countries-outline',
+            'type': 'line',
+            'source': 'countries',
+            'source-layer': 'country_boundaries',
+            'paint': {
+                'line-color': '#000000',
+                'line-width': 0.5
+            }
+        });
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+        // ... TO HERE
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+// TODO: Upload and customize your layers !
+
+        // Add custom tileset layer for bathymetry
+        map.addSource('bathymetry', {
+            'type': 'vector',
+            'url': 'mapbox://luciarebolino.9iqwq3fv' // Replace with your actual tileset ID
+        });
+
+        map.addLayer({
+            'id': 'bathymetry-outline',
+            'type': 'line',
+            'source': 'bathymetry',
+            'source-layer': 'batimetria-dufemr', // This should be the name of the source layer in your tileset
+            'paint': {
+                'line-color': 'blue',
+                'line-width': 0.1
+            }
+        });
+
+        // Add GeoTIFF layer
+        // map.addSource('ndvi-geotiff', {
+        //     'type': 'raster',
+        //     'url': 'mapbox://luciarebolino.32l0ff9l', // Replace with your actual tileset ID
+        //     'tileSize': 256
+        // });
+
+        // map.addLayer({
+        //     'id': 'ndvi-geotiff-layer',
+        //     'type': 'raster',
+        //     'source': 'ndvi-geotiff',
+        //     'paint': {
+        //         'raster-opacity': 0.3
+        //     }
+        // });
+    });
+ ///////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
