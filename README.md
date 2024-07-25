@@ -1,4 +1,124 @@
+# GEOBODIES - AAVS TerrainLab
 
+<img width="1529" alt="Screenshot 2024-07-26 at 12 05 22 AM" src="https://github.com/user-attachments/assets/0bb9f9f2-1520-4df4-a448-47786240741b">
+
+## Tutorial: Upload and Style Your GeoJSON and GeoTIFF Layers on a Mapbox Map
+
+### Step 1: Setup and Basic Map Configuration
+
+Start with the provided code, which initializes a Mapbox map and adds a countries outline layer:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Geobodies_WebMap_Test</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<script>
+    // Set your Mapbox access token
+    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN'; // Replace with your Mapbox access token
+
+    // Initialize the map
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: {
+            "version": 8,
+            "sources": {},
+            "layers": []
+        },
+        center: [12.292051, 45.372576], // Venice Lagoon coordinates
+        zoom: 10
+    });
+
+    // Add countries outline layer
+    map.on('load', function () {
+        map.addSource('countries', {
+            'type': 'vector',
+            'url': 'mapbox://mapbox.country-boundaries-v1'
+        });
+
+        map.addLayer({
+            'id': 'countries-outline',
+            'type': 'line',
+            'source': 'countries',
+            'source-layer': 'country_boundaries',
+            'paint': {
+                'line-color': '#000000',
+                'line-width': 0.5
+            }
+        });
+
+        // Add zoom and rotation controls to the map
+        map.addControl(new mapboxgl.NavigationControl());
+
+        // Add custom tileset layer for bathymetry
+        map.addSource('bathymetry', {
+            'type': 'vector',
+            'url': 'mapbox://YOUR_TILESET_ID' // Replace with your actual tileset ID
+        });
+
+        map.addLayer({
+            'id': 'bathymetry-outline',
+            'type': 'line',
+            'source': 'bathymetry',
+            'source-layer': 'YOUR_SOURCE_LAYER_NAME', // This should be the name of the source layer in your tileset
+            'paint': {
+                'line-color': 'blue',
+                'line-width': 0.1
+            }
+        });
+    });
+</script>
+</body>
+</html>
+```
+
+### Adding Your Own GeoJSON and GeoTIFF Layers
+### Example 1: Adding a Point Shapefile Layer
+- Step 2: Convert and Upload Your Point Shapefile as GeoJSON
+1. Convert your point shapefile to GeoJSON format.
+1. Upload your GeoJSON file to Mapbox Studio:
+1. Go to Mapbox Studio.
+1. Click on "Tilesets" and then "New tileset".
+1. Upload your GeoJSON file and publish it.
+Note the tileset ID provided after the upload is complete.
+
+- Step 3: Add the GeoJSON Layer to Your Map
+1. Replace YOUR_TILESET_ID with the tileset ID of your uploaded GeoJSON file.
+
+```javascript
+<script>
+    map.on('load', function () {
+        // Add a GeoJSON point layer
+        map.addSource('points', {
+            'type': 'vector',
+            'url': 'mapbox://YOUR_TILESET_ID' // Replace with the tileset ID of your GeoJSON file
+        });
+
+        map.addLayer({
+            'id': 'points-layer',
+            'type': 'circle',
+            'source': 'points',
+            'source-layer': 'YOUR_SOURCE_LAYER_NAME', // This should be the name of the source layer in your tileset
+            'paint': {
+                'circle-radius': 5,
+                'circle-color': '#ff0000'
+            }
+        });
+    });
+</script>
+```
 
 
 # 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
