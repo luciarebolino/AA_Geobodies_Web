@@ -1,4 +1,30 @@
-# 1. SHIPPING LANES - Sentinel-1 - SAR
+# 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
+
+>The Normalized Difference Vegetation Index (NDVI) is a numerical indicator that uses the visible and near-infrared bands of the electromagnetic spectrum to analyze vegetation health. The NDVI is calculated using the following formula:
+>
+$$
+\text{NDVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red}}
+$$
+
+### Step 1: Define the NDVI Color Palette
+We start by defining the color palette to visualize the NDVI values. This palette ranges from white (low NDVI) to dark green (high NDVI).
+```ruby
+var ndvi_palette = [
+  'FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', 
+  '99B718', '74A901', '66A000', '529400', '3E8601', 
+  '207401', '056201', '004C00'
+].join(',');
+```
+
+### Step 2: Define Your Geometry
+Replace the placeholder with your specific geometry coordinates.
+```ruby
+var geometry = geometry;
+```
+
+
+
+# 4. SHIPPING LANES - Sentinel-1 - SAR
 
 ### Step 1: Sentinel-1 VH Polarization Analysis
 The Sentinel-1 GRD (Ground Range Detected) data is loaded from the GEE Data Catalog.
