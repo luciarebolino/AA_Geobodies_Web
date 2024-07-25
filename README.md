@@ -6,9 +6,13 @@ $$
 \text{NDVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red}}
 $$
 
+<img width="1529" alt="Screenshot 2024-07-25 at 9 39 52 PM" src="https://github.com/user-attachments/assets/821004f5-0725-4876-ba8b-19135a999932">
+
+
+
 ### Step 1: Define the NDVI Color Palette
 We start by defining the color palette to visualize the NDVI values. This palette ranges from white (low NDVI) to dark green (high NDVI).
-```ruby
+```javascript
 var ndvi_palette = [
   'FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', 
   '99B718', '74A901', '66A000', '529400', '3E8601', 
@@ -18,12 +22,149 @@ var ndvi_palette = [
 
 ### Step 2: Define Your Geometry
 Replace the placeholder with your specific geometry coordinates.
-```ruby
+```javascript
 var geometry = geometry;
 ```
+### Step 3: Center the Map on the Geometry
+Center the map view on the defined geometry with a zoom level of 12.
+```javascript
+Map.centerObject(geometry, 12);
+```
+### Step 4: Function to Add NDVI Band to Sentinel-2 Images
+Define a function to calculate NDVI and add it as a band to each Sentinel-2 image.
+```javascript
+function addnd(input) {
+  // Sentinel-2 NDVI calculation (B8 - NIR, B4 - Red)
+  var nd = input.normalizedDifference(['B8', 'B4']).rename('ndvi');
+  return input.addBands(nd);
+}
+```
 
+### Step 5: Set Date Range for Sentinel-2
+Define the start and end dates for filtering the Sentinel-2 image collection.
+```javascript
+var S2_startDate = '2020-01-01'; // Define your start date
+var S2_endDate = '2020-12-31'; // Define your end date
+```
 
+### Step 6: Create Sentinel-2 Image Collection and Apply Filters
+Create the image collection, filter it by bounds, date range, and cloud cover percentage, and apply the NDVI calculation function.
+```javascript
+var S2_collection = ee.ImageCollection("COPERNICUS/S2")
+  .filterBounds(geometry) // Filter collection by geometry
+  .filterDate(S2_startDate, S2_endDate) // Filter collection by date range
+  .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than', 10) // Filter images with less than 10% cloud cover
+  .map(addnd); // Apply the addnd function to each image in the collection
+```
 
+### Step 7: Print the Image Collection to the Console for Inspection
+Output the filtered image collection to the console for inspection.
+```javascript
+print(S2_collection);
+```
+
+### Step 8: Create a Mosaic (Median Composite) of the Collection
+Create a median composite of the filtered collection and clip it to the geometry.
+```javascript
+var S2_mosaic = S2_collection.median().clip(geometry); // Create a median composite and clip to the geometry
+
+```
+
+### Step 9: Display the Mosaic in Natural Color
+Display the natural color composite of the mosaic on the map.
+```javascript
+var S2_display = {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000};
+Map.addLayer(S2_mosaic, S2_display, "Sentinel-2"); // Add the natural color mosaic to the map
+```
+
+### Step 10: Select the NDVI Band and Create a Mosaic
+Select the NDVI band, create a median composite, and clip it to the geometry.
+```javascript
+var ndvi_S2 = S2_collection.select('ndvi').median().clip(geometry); // Create a median composite of the NDVI band and clip to the geometry
+```
+
+### Step 11: Display the NDVI Mosaic
+Display the NDVI mosaic on the map with the specified color palette.
+```javascript
+Map.addLayer(ndvi_S2, {min: -0.1, max: 1, palette: ndvi_palette}, 'NDVI S2', false); // Add the NDVI mosaic to the map
+```
+
+### Step 12: Export the NDVI Mosaic as a GeoTIFF to Google Drive
+Export the NDVI mosaic as a GeoTIFF file to Google Drive.
+```javascript
+Export.image.toDrive({
+  image: ndvi_S2, // The image to export
+  description: 'NDVI_Sentinel2', // Description of the export task
+  scale: 10, // Sentinel-2 resolution
+  region: geometry, // The region to export
+  fileFormat: 'GeoTIFF', // Export format
+  formatOptions: {
+    cloudOptimized: true
+  }
+});
+```
+## FULL CODE
+```javascript
+// Define the NDVI color palette
+var ndvi_palette = [
+  'FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', 
+  '99B718', '74A901', '66A000', '529400', '3E8601', 
+  '207401', '056201', '004C00'
+].join(',');
+
+// Define your geometry (replace with your coordinates)
+var geometry = geometry;
+
+// Center the map on the geometry
+Map.centerObject(geometry, 12);
+
+// Function to add NDVI band to Sentinel-2 images
+function addnd(input) {
+  // Sentinel-2 NDVI calculation (B8 - NIR, B4 - Red)
+  var nd = input.normalizedDifference(['B8', 'B4']).rename('ndvi');
+  return input.addBands(nd);
+}
+
+// Set date range for Sentinel-2
+var S2_startDate = '2020-01-01'; // Define your start date
+var S2_endDate = '2020-12-31'; // Define your end date
+
+// Create Sentinel-2 image collection and apply filters
+var S2_collection = ee.ImageCollection("COPERNICUS/S2")
+  .filterBounds(geometry) // Filter collection by geometry
+  .filterDate(S2_startDate, S2_endDate) // Filter collection by date range
+  .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than', 10) // Filter images with less than 10% cloud cover
+  .map(addnd); // Apply the addnd function to each image in the collection
+
+// Print the image collection to the console for inspection
+print(S2_collection);
+
+// Create a mosaic (median composite) of the collection
+var S2_mosaic = S2_collection.median().clip(geometry); // Create a median composite and clip to the geometry
+
+// Display the mosaic in natural color
+var S2_display = {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000};
+Map.addLayer(S2_mosaic, S2_display, "Sentinel-2"); // Add the natural color mosaic to the map
+
+// Select the NDVI band and create a mosaic
+var ndvi_S2 = S2_collection.select('ndvi').median().clip(geometry); // Create a median composite of the NDVI band and clip to the geometry
+
+// Display the NDVI mosaic
+Map.addLayer(ndvi_S2, {min: -0.1, max: 1, palette: ndvi_palette}, 'NDVI S2', false); // Add the NDVI mosaic to the map
+
+// Export the NDVI mosaic as a GeoTIFF to Google Drive
+Export.image.toDrive({
+  image: ndvi_S2, // The image to export
+  description: 'NDVI_Sentinel2', // Description of the export task
+  scale: 10, // Sentinel-2 resolution
+  region: geometry, // The region to export
+  fileFormat: 'GeoTIFF', // Export format
+  formatOptions: {
+    cloudOptimized: true
+  }
+}); // Export the NDVI mosaic to Google Drive
+
+```
 # 4. SHIPPING LANES - Sentinel-1 - SAR
 
 ### Step 1: Sentinel-1 VH Polarization Analysis
