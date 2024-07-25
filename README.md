@@ -1,3 +1,6 @@
+
+
+
 # 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
 
 The Normalized Difference Vegetation Index (NDVI) is a numerical indicator that uses the visible and near-infrared bands of the electromagnetic spectrum to analyze vegetation health. The NDVI is calculated using the following formula:
@@ -209,6 +212,11 @@ $$
 
 
 # 5. SHIPPING LANES - Sentinel-1 - SAR
+
+<img width="1529" alt="Screenshot 2024-07-25 at 9 41 52 PM" src="https://github.com/user-attachments/assets/50d4dc88-4b5a-435d-97ea-aa3b46ae55bd">
+
+
+
 
 ### Step 1: Sentinel-1 VH Polarization Analysis
 The Sentinel-1 GRD (Ground Range Detected) data is loaded from the GEE Data Catalog.
