@@ -119,7 +119,83 @@ Note the tileset ID provided after the upload is complete.
     });
 </script>
 ```
+### Example 2: Adding a Polygon or Line Shapefile Layer
+- Step 4: Convert and Upload Your Polygon or Line Shapefile as GeoJSON
+1. Convert your polygon or line shapefile to GeoJSON format.
+1. Upload your GeoJSON file to Mapbox Studio:
+1. Go to Mapbox Studio.
+1. Click on "Tilesets" and then "New tileset".
+1. Upload your GeoJSON file and publish it.
+1. Note the tileset ID provided after the upload is complete.
+- Step 5: Add the GeoJSON Layer to Your Map
+1. Replace YOUR_TILESET_ID with the tileset ID of your uploaded GeoJSON file.
 
+```javascript
+<script>
+    map.on('load', function () {
+        // Add a GeoJSON polygon layer
+        map.addSource('polygons', {
+            'type': 'vector',
+            'url': 'mapbox://YOUR_TILESET_ID' // Replace with the tileset ID of your GeoJSON file
+        });
+
+        // Add fill layer for the polygons
+        map.addLayer({
+            'id': 'polygons-fill-layer',
+            'type': 'fill',
+            'source': 'polygons',
+            'source-layer': 'YOUR_SOURCE_LAYER_NAME', // This should be the name of the source layer in your tileset
+            'paint': {
+                'fill-color': '#00ff00',
+                'fill-opacity': 0.5
+            }
+        });
+
+        // Add line layer for the polygon outlines
+        map.addLayer({
+            'id': 'polygons-line-layer',
+            'type': 'line',
+            'source': 'polygons',
+            'source-layer': 'YOUR_SOURCE_LAYER_NAME', // This should be the name of the source layer in your tileset
+            'paint': {
+                'line-color': '#000000', // Stroke color
+                'line-width': 2 // Stroke width
+            }
+        });
+    });
+</script>
+```
+### Example 3: Adding a GeoTIFF Layer
+- Step 6: Convert and Upload Your GeoTIFF File
+1. Convert your GeoTIFF file to a format that Mapbox GL JS can use (e.g., using gdal2tiles.py).
+1. Upload your GeoTIFF file to Mapbox Studio:
+1. Go to Mapbox Studio.
+1. Click on "Tilesets" and then "New tileset".
+1. Upload your GeoTIFF file and publish it.
+1. Note the tileset ID provided after the upload is complete.
+- Step 7: Add the GeoTIFF Layer to Your Map
+1.  Replace YOUR_TILESET_ID with the tileset ID of your uploaded GeoTIFF file.
+
+```javascript
+<script>
+    map.on('load', function () {
+        // Add a GeoTIFF layer
+        map.addSource('geotiff', {
+            'type': 'raster',
+            'url': 'mapbox://YOUR_TILESET_ID' // Replace with the tileset ID of your GeoTIFF file
+        });
+
+        map.addLayer({
+            'id': 'geotiff-layer',
+            'type': 'raster',
+            'source': 'geotiff',
+            'paint': {
+                'raster-opacity': 0.8
+            }
+        });
+    });
+</script>
+```
 
 # 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
 
