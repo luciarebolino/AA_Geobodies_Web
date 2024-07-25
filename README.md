@@ -1,7 +1,7 @@
 # 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
 
->The Normalized Difference Vegetation Index (NDVI) is a numerical indicator that uses the visible and near-infrared bands of the electromagnetic spectrum to analyze vegetation health. The NDVI is calculated using the following formula:
->
+The Normalized Difference Vegetation Index (NDVI) is a numerical indicator that uses the visible and near-infrared bands of the electromagnetic spectrum to analyze vegetation health. The NDVI is calculated using the following formula:
+
 $$
 \text{NDVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red}}
 $$
@@ -168,9 +168,9 @@ Export.image.toDrive({
 
 
 
-# 1. NDWI (Normalized Difference Water Index) - Sentinel-2 
+# 2. NDWI (Normalized Difference Water Index) - Sentinel-2 
 
->The Normalized Difference Water Index (NDWI) is a numerical indicator that uses the green and near-infrared (NIR) bands of the electromagnetic spectrum to delineate open water features and enhance the presence of water bodies in remotely sensed digital imagery. It is particularly useful for identifying water bodies and monitoring changes in water content in vegetation and soil. The NDWI is calculated using the following formula:
+The Normalized Difference Water Index (NDWI) is a numerical indicator that uses the green and near-infrared (NIR) bands of the electromagnetic spectrum to delineate open water features and enhance the presence of water bodies in remotely sensed digital imagery. It is particularly useful for identifying water bodies and monitoring changes in water content in vegetation and soil. The NDWI is calculated using the following formula:
 
 $$
 \text{NDWI} = \frac{\text{Green} - \text{NIR}}{\text{Green} + \text{NIR}}
@@ -179,7 +179,36 @@ $$
 <img width="1529" alt="Screenshot 2024-07-25 at 9 41 19 PM" src="https://github.com/user-attachments/assets/e7b63b69-a6d2-4cda-8072-f0c4bbe8a6b5">
 
 
-# 4. SHIPPING LANES - Sentinel-1 - SAR
+# 3. NDCI (Normalized Difference Chlorophyll) - Sentinel-2 
+The Normalized Difference Chlorophyll Index (NDCI) is a numerical indicator used to estimate the concentration of chlorophyll in water bodies. It leverages the reflectance properties of water at specific wavelengths to provide an estimate of chlorophyll concentration, which is an important parameter for monitoring water quality and the health of aquatic ecosystems. The NDCI is calculated using the following formula:
+
+$$
+\text{NDCI} = \frac{\text{Red Edge} - \text{Red}}{\text{Red Edge} + \text{Red}}
+$$
+
+In this formula:
+- **Red Edge** refers to a wavelength band around 705 nm.
+- **Red** refers to a wavelength band around 665 nm.
+
+The NDCI value ranges from -1 to 1, where higher values indicate higher chlorophyll concentrations.
+<img width="1529" alt="Screenshot 2024-07-25 at 9 40 38 PM" src="https://github.com/user-attachments/assets/cad79d7a-3219-4df1-b2ca-520fae57ebb9">
+
+# 4.TSS (Total Suspended Solids) - Sentinel-2
+
+Total Suspended Solids (TSS) refer to the solid particles suspended in water, which can include a wide variety of material such as silt, decaying plant and animal matter, industrial wastes, and sewage. High concentrations of suspended solids can affect water quality and aquatic life.
+
+The TSS is calculated using the following empirical formula:
+
+$$
+\text{TSS} = \frac{R_{\text{Red}} \times 961}{1 - \frac{R_{\text{Red}}}{0.1728}} + 29
+$$
+
+<img width="1529" alt="Screenshot 2024-07-25 at 9 43 00 PM" src="https://github.com/user-attachments/assets/ca705a6f-0d83-4538-b954-9d7e718bc6c1">
+
+
+
+
+# 5. SHIPPING LANES - Sentinel-1 - SAR
 
 ### Step 1: Sentinel-1 VH Polarization Analysis
 The Sentinel-1 GRD (Ground Range Detected) data is loaded from the GEE Data Catalog.
