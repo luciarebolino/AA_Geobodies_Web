@@ -220,7 +220,7 @@ $$
 
 <img width="1529" alt="Screenshot 2024-07-25 at 9 39 52 PM" src="https://github.com/user-attachments/assets/821004f5-0725-4876-ba8b-19135a999932">
 
-GO TO gee code editor [AA_NDVI](https://code.earthengine.google.com/1221aad06de10e9d9abba5128bac9be9)
+> GO TO gee code editor [AA_NDVI](https://code.earthengine.google.com/1221aad06de10e9d9abba5128bac9be9)
 
 ### Step 1: Define the NDVI Color Palette
 We start by defining the color palette to visualize the NDVI values. This palette ranges from white (low NDVI) to dark green (high NDVI).
@@ -389,6 +389,126 @@ $$
 $$
 
 <img width="1529" alt="Screenshot 2024-07-25 at 9 41 19 PM" src="https://github.com/user-attachments/assets/e7b63b69-a6d2-4cda-8072-f0c4bbe8a6b5">
+
+> GO TO gee code editor [AA_NDWI](https://code.earthengine.google.com/91b53de819f56a0c041d31f152dce276)
+
+## FULL CODE
+```javascript
+// Define the area of interest
+var areaOfInterest = geometry; 
+
+// Print the coordinates of the area of interest
+print("Coordinates of the area of interest:", areaOfInterest.coordinates());
+
+// Zoom to the area of interest and add it to the map
+Map.centerObject(areaOfInterest);
+Map.addLayer(areaOfInterest);
+
+// Define the date range for the image collection
+var startDate = '2022-04-11';
+var endDate = '2022-12-31';
+
+// Get all the Landsat 8 images taken over the area of interest within the date range
+var landsatImageCollection = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
+                  .filterBounds(areaOfInterest)
+                  .filterDate(startDate, endDate)
+                  .sort('system:time_start');
+
+// Print the number of images in the collection
+print("Number of images = ", landsatImageCollection.size());
+
+// Check the first few images and their metadata
+var imageList = landsatImageCollection.toList(10);
+for (var i = 0; i < 10; i++) {
+  var image = ee.Image(imageList.get(i));
+  print("Image", i, image);
+}
+
+// Function to create an NDWI image with a specific visualization
+function createNdwiImage(image) {
+  var ndwi = image.normalizedDifference(['SR_B3', 'SR_B5']).rename('NDWI');
+  var ndwiVis = ndwi.visualize({min: -0.4, max: 0.2, palette: ['black', 'black', 'black', 'pink', 'blue']});
+  return ndwiVis.set({
+    'system:time_start': image.get('system:time_start')
+  });
+}
+
+// Map the function over the collection and select the NDWI visualization
+var ndwiCollection = landsatImageCollection.map(createNdwiImage);
+
+// Define video parameters
+var videoArgs = {
+  region: areaOfInterest,
+  framesPerSecond: 10,
+  crs: 'EPSG:3857',
+  min: -0.4,
+  max: 0.2,
+  palette: ['black', 'black', 'black', 'pink', 'blue']
+};
+
+// Print the URL to download the video
+print(ui.Thumbnail(ndwiCollection, videoArgs));
+
+// Export the NDWI time-lapse video to Google Drive
+Export.video.toDrive({
+  collection: ndwiCollection,
+  description: 'NDWI_Time_Lapse',
+  fileNamePrefix: 'NDWI_Time_Lapse',
+  framesPerSecond: 10,
+  region: areaOfInterest,
+  dimensions: 720,
+  crs: 'EPSG:3857'
+});
+
+// Visualize the first image if available
+if (landsatImageCollection.size().getInfo() > 0) {
+  // Get the first image with the least cloud cover
+  var landsatImage = landsatImageCollection.sort('CLOUD_COVER')
+      .first()
+      .clip(areaOfInterest);
+
+  // Print the date of the Landsat image
+  print("Landsat image taken at = ", landsatImage.date());
+
+  // Visualize the image using RGB bands
+  Map.addLayer(landsatImage, {min: 500.0, max: 12000.0, gamma: 0.5, bands: ['SR_B4', 'SR_B3', 'SR_B2']}, 'Landsat 8');
+
+  // Calculate and visualize NDWI
+  var ndwi = landsatImage.normalizedDifference(['SR_B3', 'SR_B5']).rename('NDWI');
+  // Enhanced NDWI visualization
+  Map.addLayer(ndwi, {min: -0.4, max: 0.2, palette: ['black', 'black', 'black', 'pink', 'blue']}, 'NDWI');
+
+  // Create NDWI mask for water (thresholded NDWI)
+  var ndwiThreshold = ndwi.gte(0.0);
+  var ndwiMask = ndwiThreshold.updateMask(ndwiThreshold);
+  Map.addLayer(ndwiThreshold, {palette:['black','white']}, 'NDWI Binary Mask');
+  
+  // Export the NDWI image as a GeoTIFF to Google Drive
+  Export.image.toDrive({
+    image: ndwi, // The NDWI image to export
+    description: 'NDWI_Image', // Description of the export task
+    dimensions: 720, // Resolution of the export
+    region: areaOfInterest, // The region to export
+    fileFormat: 'GeoTIFF', // Export format
+    formatOptions: {
+      cloudOptimized: true // Cloud optimization for GeoTIFF
+    }
+  });
+  
+  // Export the NDWI mask as a GeoTIFF to Google Drive
+  Export.image.toDrive({
+    image: ndwiMask, // The NDWI mask to export
+    description: 'NDWI_Mask', // Description of the export task
+    dimensions: 720, // Resolution of the export
+    region: areaOfInterest, // The region to export
+    fileFormat: 'GeoTIFF', // Export format
+    formatOptions: {
+      cloudOptimized: true // Cloud optimization for GeoTIFF
+    }
+  });
+}
+```
+
 
 
 # 3. NDCI (Normalized Difference Chlorophyll) - Sentinel-2 
