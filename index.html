@@ -214,39 +214,66 @@
     // Toggle video on click
     map.on('click', function() {
         if (videoVisible) {
-            if (map.getLayer('video-layer')) {
-                map.removeLayer('video-layer');
+            if (map.getLayer('video-layer1')) {
+                map.removeLayer('video-layer1');
             }
-            if (map.getSource('video')) {
-                var video = map.getSource('video').getVideo();
-                video.pause();
-                map.removeSource('video');
+            if (map.getLayer('video-layer2')) {
+                map.removeLayer('video-layer2');
+            }
+            if (map.getSource('video1')) {
+                var video1 = map.getSource('video1').getVideo();
+                video1.pause();
+                map.removeSource('video1');
+            }
+            if (map.getSource('video2')) {
+                var video2 = map.getSource('video2').getVideo();
+                video2.pause();
+                map.removeSource('video2');
             }
             videoVisible = false;
         } else {
-            map.addSource('video', {
+            map.addSource('video1', {
                 type: 'video',
-                urls: [
-                    'https://attachments.are.na/29588406/cbb9ed63dd4eeba8c0a667beca67c254.mp4?1721822528' // Path to your video file
-                ],
+                urls: ['https://attachments.are.na/29588406/cbb9ed63dd4eeba8c0a667beca67c254.mp4?1721822528'],
                 coordinates: [
-                    // Corrected bounding box coordinates
-                    [12.073989772214944, 45.60774777837705],  // New Northeast corner (original Northwest corner)
-                    [12.687850856199319, 45.60774777837705],  // New Northwest corner (original Northeast corner)
-                    [12.687850856199319, 45.16311249146351],  // New Southwest corner (original Southeast corner)
-                    [12.073989772214944, 45.16311249146351]  
+                    [12.073989772214944, 45.60774777837705],
+                    [12.687850856199319, 45.60774777837705],
+                    [12.687850856199319, 45.16311249146351],
+                    [12.073989772214944, 45.16311249146351]
                 ]
             });
 
             map.addLayer({
-                id: 'video-layer',
+                id: 'video-layer1',
                 type: 'raster',
-                source: 'video',
+                source: 'video1',
                 paint: {}
             });
 
-            var video = map.getSource('video').getVideo();
-            video.play();
+            map.addSource('video2', {
+                type: 'video',
+                urls: ['https://attachments.are.na/29624314/addd5ab00a588c38a4fe352542ddba40.mp4?1721955846'],
+                coordinates: [
+                    [12.441951006440325, 45.465568788666474],
+                    [12.58614656308095, 45.465568788666474],
+                    [12.58614656308095, 45.559877572473596],
+                    [12.441951006440325, 45.559877572473596]
+                ]
+            });
+
+            map.addLayer({
+                id: 'video-layer2',
+                type: 'raster',
+                source: 'video2',
+                paint: {}
+            });
+
+            var video1 = map.getSource('video1').getVideo();
+            var video2 = map.getSource('video2').getVideo();
+
+            video1.play();
+            video2.play();
+
             videoVisible = true;
         }
     });
