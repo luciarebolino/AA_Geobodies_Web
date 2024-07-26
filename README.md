@@ -1,5 +1,9 @@
 # GEOBODIES - AAVS TerrainLab
-## Workshop Web Spectral Indexes - July 2024 (Venice)
+Workshop Web Spectral Indexes - July 2024 (Venice)
+
+:globe_with_meridians:
+WEB
+
 <img width="1529" alt="Screenshot 2024-07-26 at 12 05 22 AM" src="https://github.com/user-attachments/assets/0bb9f9f2-1520-4df4-a448-47786240741b">
 
 ## Tutorial: Upload and Style Your GeoJSON and GeoTIFF Layers on a Mapbox Map
@@ -202,6 +206,9 @@ Note the tileset ID provided after the upload is complete.
 1. Click on "Share" or "Share & use".
 1. Toggle the switch to make the tileset public.
 1. Note the tileset ID provided after the upload is complete.
+
+:globe_with_meridians:
+SPECTRAL INDEXES
 
 ## 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
 
