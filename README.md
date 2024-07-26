@@ -525,6 +525,75 @@ In this formula:
 The NDCI value ranges from -1 to 1, where higher values indicate higher chlorophyll concentrations.
 <img width="1529" alt="Screenshot 2024-07-25 at 9 40 38 PM" src="https://github.com/user-attachments/assets/cad79d7a-3219-4df1-b2ca-520fae57ebb9">
 
+> GO TO gee code editor [AA_NDCI](https://code.earthengine.google.com/107ac215e048de968bc85b5972aaf704)
+## FULL CODE
+```javascript
+// Define the area of interest
+var geometry = geometry;
+          
+// Load the Sentinel-2 SR Harmonized ImageCollection
+var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED');
+
+// Define the start and end dates for the image collection
+var startDate = ee.Date.fromYMD(2022, 8, 15);
+var endDate = startDate.advance(10, 'day');
+
+// Filter the image collection by date and region of interest (geometry)
+var filtered = s2
+  .filter(ee.Filter.date(startDate, endDate))
+  .filter(ee.Filter.bounds(geometry));
+
+// Select the first image from the filtered collection
+var image = filtered.first(); 
+
+// Calculate the Normalized Difference Chlorophyll Index (NDCI)
+// NDCI aims to predict the chlorophyll content in turbid productive waters
+// using 'RED EDGE' (B5) and 'RED' (B4) bands
+var ndci = image.normalizedDifference(['B5', 'B4']).rename(['ndci']);
+
+// Calculate the Modified Normalized Difference Water Index (MNDWI)
+// MNDWI uses 'GREEN' (B3) and 'SWIR1' (B11) bands to highlight water bodies
+var mndwi = image.normalizedDifference(['B3', 'B11']).rename(['mndwi']); 
+
+// Select all pixels with high NDCI and high MNDWI to identify algal blooms
+// Thresholds may need adjustment based on the specific region
+var algae = ndci.gt(0.1).and(mndwi.gt(0.5));
+
+// Define visualization parameters for different layers
+var rgbVis = {min: 500, max: 2500, bands: ['B4', 'B3', 'B2']};
+var ndwiVis = {min:0, max:0.5, palette: ['white', 'blue']};
+var ndciVis = {min:0, max:0.5, palette: ['white', 'red']};
+var algaeVis = {min:0, max:1, palette: ['white', '#31a354']};
+
+// Center the map on the specified geometry at a zoom level of 12
+Map.centerObject(geometry, 12);
+
+// Add the RGB image layer to the map
+Map.addLayer(image.clip(geometry), rgbVis, 'Image');
+
+// Add the MNDWI layer to the map (initially hidden)
+Map.addLayer(mndwi.clip(geometry), ndwiVis, 'MNDWI', false);
+
+// Add the NDCI layer to the map (initially hidden)
+Map.addLayer(ndci.clip(geometry), ndciVis, 'NDCI', false);
+
+// Add the algal bloom detection layer to the map
+Map.addLayer(algae.clip(geometry).selfMask(), algaeVis, 'Algal Bloom');
+
+// Export the algal bloom detection as a GeoTIFF to Google Drive
+Export.image.toDrive({
+  image: algae, // The image to export
+  description: 'Algal_Bloom_Detection', // Description of the export task
+  region: geometry, // The region to export
+  dimensions:720, 
+  crs: 'EPSG:3857', // Coordinate reference system
+  fileFormat: 'GeoTIFF', // Export format
+  formatOptions: {
+    cloudOptimized: true // Cloud optimization for GeoTIFF
+  }
+});
+```
+
 # 4.TSS (Total Suspended Solids) - Sentinel-2
 
 Total Suspended Solids (TSS) refer to the solid particles suspended in water, which can include a wide variety of material such as silt, decaying plant and animal matter, industrial wastes, and sewage. High concentrations of suspended solids can affect water quality and aquatic life.
@@ -698,39 +767,62 @@ exportVideoAndCountImages('2019-01-01', '2019-02-01');
 
 
 
-
-### Step 1: Sentinel-1 VH Polarization Analysis
-The Sentinel-1 GRD (Ground Range Detected) data is loaded from the GEE Data Catalog.
-```ruby
+> GO TO gee code editor [AA_SAR](https://code.earthengine.google.com/2d9864dbfaf32a8c8b77e07611274635)
+## FULL CODE
+```javascript
+// Load the Sentinel-1 ImageCollection
 var sentinel1 = ee.ImageCollection('COPERNICUS/S1_GRD');
-```
-### Step 2: Filter by Metadata Properties
-We filter the data to include images with VH polarization and those collected in Interferometric Wide Swath (IW) mode within the specified date range.
-```ruby
+
+// Filter by metadata properties to get VH polarization and IW mode
 var vh = sentinel1
   .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
   .filter(ee.Filter.eq('instrumentMode', 'IW'))
   .filterDate("2015-01-01","2019-02-01");
-```
-### Step 3: Filter to Get Images from Different Look Angles
-We separate the images into ascending and descending orbits.
-```ruby
+
+// Further filter to get images from different look angles (ascending and descending)
 var vhAscending = vh.filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
 var vhDescending = vh.filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'));
-```
-### Step 4: Create Composite Images 
-We create composite images by selecting the maximum VH value for each pixel from the ascending and descending pass images.
-```ruby
+
+// Create composites by taking the maximum value of VH polarization for ascending and descending passes
 var vhMaxA = vhAscending.select('VH').max();
 var vhMaxD = vhDescending.select('VH').max();
-```
-### Step 5: Visualizing Results
-We set the map center to Venice, and add the composite layers to the map.
-```ruby
+
+// Center the map on a specific location (latitude, longitude) and zoom level
 Map.setCenter(12.3358, 45.4375, 11);
+
+// Add the ascending pass composite to the map with specified visualization parameters
 Map.addLayer(vhMaxA, {min: -15, max: 0}, 'VH ASC max', 0);
+
+// Add the descending pass composite to the map with specified visualization parameters
 Map.addLayer(vhMaxD, {min: -15, max: 0}, 'VH DES max');
+
+// Export the ascending pass composite as a GeoTIFF to Google Drive
+Export.image.toDrive({
+  image: vhMaxA, // The image to export
+  description: 'VH_ASC_max', // Description of the export task
+  region: Map.getBounds(true), // The region to export
+  dimensions: 720,
+  crs: 'EPSG:3857', // Coordinate reference system
+  fileFormat: 'GeoTIFF', // Export format
+  formatOptions: {
+    cloudOptimized: true // Cloud optimization for GeoTIFF
+  }
+});
+
+// Export the descending pass composite as a GeoTIFF to Google Drive
+Export.image.toDrive({
+  image: vhMaxD, // The image to export
+  description: 'VH_DES_max', // Description of the export task
+  region: Map.getBounds(true), // The region to export
+  dimensions: 720,
+  crs: 'EPSG:3857', // Coordinate reference system
+  fileFormat: 'GeoTIFF', // Export format
+  formatOptions: {
+    cloudOptimized: true // Cloud optimization for GeoTIFF
+  }
+});
 ```
+
 ## Explanation of Ascending and Descending Orbits
 
 > Ascending passes occur when the satellite moves from south to north, typically in the afternoon or evening.
