@@ -210,7 +210,7 @@ Note the tileset ID provided after the upload is complete.
 :globe_with_meridians:
 SPECTRAL INDEXES
 
-## 1. NDVI (Normalized Difference Vegetation Index) - Sentinel-2 
+## 1. NDVI (Normalized Difference Vegetation Index) - Sentinel2 
 
 The Normalized Difference Vegetation Index (NDVI) is a numerical indicator that uses the visible and near-infrared bands of the electromagnetic spectrum to analyze vegetation health. The NDVI is calculated using the following formula:
 
@@ -380,7 +380,7 @@ Export.image.toDrive({
 
 
 
-# 2. NDWI (Normalized Difference Water Index) - Sentinel-2 
+# 2. NDWI (Normalized Difference Water Index) - Sentinel2 
 
 The Normalized Difference Water Index (NDWI) is a numerical indicator that uses the green and near-infrared (NIR) bands of the electromagnetic spectrum to delineate open water features and enhance the presence of water bodies in remotely sensed digital imagery. It is particularly useful for identifying water bodies and monitoring changes in water content in vegetation and soil. The NDWI is calculated using the following formula:
 
@@ -511,7 +511,7 @@ if (landsatImageCollection.size().getInfo() > 0) {
 
 
 
-# 3. NDCI (Normalized Difference Chlorophyll) - Sentinel-2 
+# 3. NDCI (Normalized Difference Chlorophyll) - Sentinel2 
 The Normalized Difference Chlorophyll Index (NDCI) is a numerical indicator used to estimate the concentration of chlorophyll in water bodies. It leverages the reflectance properties of water at specific wavelengths to provide an estimate of chlorophyll concentration, which is an important parameter for monitoring water quality and the health of aquatic ecosystems. The NDCI is calculated using the following formula:
 
 $$
@@ -594,7 +594,7 @@ Export.image.toDrive({
 });
 ```
 
-# 4.TSS (Total Suspended Solids) - Sentinel-2
+# 4.TSS (Total Suspended Solids) - Sentinel2
 
 Total Suspended Solids (TSS) refer to the solid particles suspended in water, which can include a wide variety of material such as silt, decaying plant and animal matter, industrial wastes, and sewage. High concentrations of suspended solids can affect water quality and aquatic life.
 
@@ -761,7 +761,7 @@ createMosaic('2019-10-31', '2020-01-21');
 exportVideoAndCountImages('2019-01-01', '2019-02-01');
 ```
 
-# 5. SHIPPING LANES - Sentinel-1 - SAR
+# 5. SHIPPING LANES - Sentinel1 - SAR
 
 <img width="1529" alt="Screenshot 2024-07-25 at 9 41 52 PM" src="https://github.com/user-attachments/assets/50d4dc88-4b5a-435d-97ea-aa3b46ae55bd">
 
@@ -850,3 +850,6 @@ Every video or timelapse exported from Google Earth Engine (GEE) will be saved a
 Feel free to test different areas—smaller or larger, with multiple palettes and varying time frames. The idea is to populate the lagoon and the area surrounding Venice with as many video indexes as possible.
 
 Regarding the GeoJSON, it is important that all the tilesets uploaded to Mapbox are shared as public so that they can be included on the main map. Please copy and paste the line of code as an example with all the layers you want to add and be visible on the platform. Experiment with shapes and colors, and add your group number (e.g., G2) to the title. In the description, write two or more lines describing your layer. These descriptions will be visible to users toggling your layer on the map in the future.
+
+:earth_americas:
+:purple_heart:
