@@ -537,8 +537,160 @@ $$
 
 <img width="1529" alt="Screenshot 2024-07-25 at 9 43 00 PM" src="https://github.com/user-attachments/assets/ca705a6f-0d83-4538-b954-9d7e718bc6c1">
 
+> GO TO gee code editor [AA_TSS](https://code.earthengine.google.com/107ac215e048de968bc85b5972aaf704)
+## FULL CODE
+```javascript
+// Define the area of interest
+var geometry = geometry;
 
+// Center the map on the specified geometry at a zoom level of 14
+Map.centerObject(geometry, 14);
 
+// Print the coordinates of the geometry
+print("Coordinates of the geometry:", geometry.coordinates());
+
+// Function to calculate Total Suspended Solids (TSS) from a Sentinel-2 image
+function calculateTSS(image) {
+  // Calculate the numerator for TSS
+  var num = image.select('B4').multiply(961);
+  
+  // Calculate the denominator for TSS
+  var dem = ee.Image(1).subtract(image.select('B4').divide(0.1728));
+  
+  // Calculate the TSS image
+  var tssimg = num.divide(dem).add(29);
+  
+  // Create a mask using the normalized difference between Band 3 (Green) and Band 8 (NIR)
+  var mask = image.normalizedDifference(['B3', 'B8']);
+  
+  // Return the TSS image with the mask applied, clipped to the geometry, and with the original image timestamp
+  return tssimg.updateMask(mask.gte(0.1)).clip(geometry)
+      .set('system:time_start', image.get('system:time_start'));
+}
+
+// Function to create a cloud-masked mosaic from Sentinel-2 images within a date range
+function createMosaic(date1, date2) {
+  // Filter the Sentinel-2 image collection by date range and region of interest
+  var collection = ee.ImageCollection('COPERNICUS/S2')
+    .filterDate(date1, date2)
+    .filterBounds(geometry);
+  
+  // Function to mask clouds using the Sentinel-2 QA60 band
+  function maskClouds(image) {
+    var qa = image.select('QA60');
+    
+    // Bits 10 and 11 are clouds and cirrus, respectively
+    var cloudBitMask = 1 << 10;
+    var cirrusBitMask = 1 << 11;
+    
+    // Both cloud and cirrus bits should be set to zero (clear condition)
+    var mask = qa.bitwiseAnd(cloudBitMask).eq(0).and(
+      qa.bitwiseAnd(cirrusBitMask).eq(0)
+    );
+    
+    // Mask the image, scale it to reflectance values, and select all bands
+    return image.updateMask(mask).divide(10000).select("B.*")
+      .copyProperties(image, ["system:time_start"]);
+  }
+  
+  // Apply the cloud masking function and calculate the median composite
+  var composite = collection.map(maskClouds).median();
+  
+  // Calculate TSS for the composite image
+  var tssImage = calculateTSS(composite);
+  
+  // Add the TSS image to the map with the specified color palette and value range
+  Map.addLayer(tssImage, {min: 0, max: 350, palette: ['#4a4e4d','#0e9aa7','#3da4ab','#f6cd61','#fe8a71','#ee4035','#f37736']}, "TSS Calculation");
+  
+  // Create an NDVI mask using the normalized difference between Band 3 (Green) and Band 8 (NIR)
+  var mask = composite.normalizedDifference(['B3', 'B8']);
+  
+  // Add the NDVI mask to the map
+  Map.addLayer(mask, {}, "NDVI Mask");
+
+  // Export the TSS mosaic as a GeoTIFF to Google Drive
+  Export.image.toDrive({
+    image: tssImage, // The image to export
+    description: 'TSS_Mosaic', // Description of the export task
+    region: geometry, // The region to export
+    dimensions: 720, // Dimensions of the export
+    crs: 'EPSG:3857', // Coordinate reference system
+    fileFormat: 'GeoTIFF', // Export format
+    formatOptions: {
+      cloudOptimized: true // Cloud optimization for GeoTIFF
+    }
+  });
+}
+
+// Function to create a 3-band RGB visualization for the video export
+function createTSSVisualization(image) {
+  // Create a visualization of the TSS image with the specified color palette and value range
+  var tssVis = image.visualize({
+    min: 0,
+    max: 350,
+    palette: ['#4a4e4d','#0e9aa7','#3da4ab','#f6cd61','#fe8a71','#ee4035','#f37736']
+  });
+  
+  // Return the visualization with the original image timestamp
+  return tssVis.set('system:time_start', image.get('system:time_start'));
+}
+
+// Function to export a video and print the number of images
+function exportVideoAndCountImages(startDate, endDate) {
+  // Filter the Sentinel-2 image collection by date range and region of interest
+  var collection = ee.ImageCollection('COPERNICUS/S2')
+    .filterDate(startDate, endDate)
+    .filterBounds(geometry);
+  
+  // Get the number of images in the collection
+  var count = collection.size().getInfo();
+  print('Number of images in the date range:', count);
+  
+  // Function to mask clouds and calculate TSS for each image
+  function maskCloudsAndCalculateTSS(image) {
+    var qa = image.select('QA60');
+    var cloudBitMask = 1 << 10;
+    var cirrusBitMask = 1 << 11;
+    var mask = qa.bitwiseAnd(cloudBitMask).eq(0).and(
+      qa.bitwiseAnd(cirrusBitMask).eq(0)
+    );
+    var cloudMasked = image.updateMask(mask).divide(10000);
+    return calculateTSS(cloudMasked);
+  }
+  
+  // Map the cloud masking and TSS calculation function over the collection
+  var tssCollection = collection.map(maskCloudsAndCalculateTSS);
+  
+  // Create a 3-band RGB visualization for each TSS image
+  var tssVisCollection = tssCollection.map(createTSSVisualization);
+  
+  // Define video export parameters
+  var videoParams = {
+    region: geometry,
+    framesPerSecond: 2,
+    crs: 'EPSG:3857',
+    min: 0,
+    max: 255, // Adjusted to match the scaled range
+  };
+  
+  // Export the TSS video to Google Drive
+  Export.video.toDrive({
+    collection: tssVisCollection,
+    dimensions: 720,
+    description: 'TSS_Video',
+    folder: 'EarthEngineExports',
+    fileNamePrefix: 'TSS_Video',
+    framesPerSecond: 2,
+    region: geometry,
+  });
+}
+
+// Create a mosaic for a specific date range and export it as a GeoTIFF
+createMosaic('2019-10-31', '2020-01-21');
+
+// Export a video and print the number of images in a longer date range
+exportVideoAndCountImages('2019-01-01', '2019-02-01');
+```
 
 # 5. SHIPPING LANES - Sentinel-1 - SAR
 
