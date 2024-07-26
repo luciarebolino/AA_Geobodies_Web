@@ -599,6 +599,8 @@ Map.addLayer(vhMaxD, {min: -15, max: 0}, 'VH DES max');
 
 <img width="1529" alt="Screenshot 2024-07-26 at 12 25 36 AM" src="https://github.com/user-attachments/assets/9c913fcb-d569-466b-a2c8-41427aa0b871">
 
+> GO to [Are.na Channel](https://www.are.na/lucia-rebolino/geobodies-aa-workshop)
+
 Every video or timelapse exported from Google Earth Engine (GEE) will be saved as a Block, with the coordinates previously printed in the console added as comments. This will enable geolocation on the map.
 
 Feel free to test different areas—smaller or larger, with multiple palettes and varying time frames. The idea is to populate the lagoon and the area surrounding Venice with as many video indexes as possible.
