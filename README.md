@@ -220,7 +220,7 @@ $$
 
 <img width="1529" alt="Screenshot 2024-07-25 at 9 39 52 PM" src="https://github.com/user-attachments/assets/821004f5-0725-4876-ba8b-19135a999932">
 
-
+GO TO gee code editor [AA_NDVI](https://code.earthengine.google.com/1221aad06de10e9d9abba5128bac9be9)
 
 ### Step 1: Define the NDVI Color Palette
 We start by defining the color palette to visualize the NDVI values. This palette ranges from white (low NDVI) to dark green (high NDVI).
